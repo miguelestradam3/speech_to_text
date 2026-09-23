@@ -52,8 +52,14 @@ class WhisperTranscriber:
       raise ValueError("No audio data found. Please record audio first.")
     self.wav.write(self.temp_filename, self.sample_rate, self.audio_data)
 
-  def transcribe_file(self, file_path: str) -> str:
-    """Transcribes any specified audio file using the whisper attribute."""
+  def save_text_to_file(self, text: str, output_path: str = "transcription.txt"):
+    """Saves the given transcription text to a .txt file."""
+    with open(output_path, "w", encoding="utf-8") as f:
+      f.write(text)
+    print(f"💾 Transcription saved successfully to: {output_path}")
+
+  def transcribe_file(self, file_path: str, output_txt: str = None) -> str:
+    """Transcribes an audio file and optionally saves the text to a .txt file."""
     self.load_model()
 
     if not self.os.path.exists(file_path):
@@ -61,14 +67,20 @@ class WhisperTranscriber:
 
     print(f"🔄 Transcribing file: {file_path}...")
     result = self.model.transcribe(file_path, fp16=False)
-    return result["text"].strip()
+    transcription = result["text"].strip()
 
-  def run_from_microphone(self):
-    """Pipeline to record from the microphone and transcribe the result."""
+    # Save to text file if an output path is provided
+    if output_txt:
+      self.save_text_to_file(text=transcription, output_path=output_txt)
+
+    return transcription
+
+  def run_from_microphone(self, output_txt: str = "mic_transcription.txt"):
+    """Pipeline to record from the microphone, transcribe, and save to a text file."""
     self.load_model()
     self.record_audio()
     self.save_audio()
 
-    transcription = self.transcribe_file(self.temp_filename)
+    transcription = self.transcribe_file(file_path=self.temp_filename, output_txt=output_txt)
     print("\n--- Microphone Transcription Result ---")
     print(transcription)
