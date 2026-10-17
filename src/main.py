@@ -2,7 +2,7 @@ from modules.voicemanager import WhisperTranscriber
 
 if __name__ == "__main__":
   # Initialize the transcriber
-  transcriber = WhisperTranscriber(model_size="base", duration=5)
+  transcriber = WhisperTranscriber(model_size="base")
 
   # --- Example 1: Record from Microphone & Save to TXT ---
   # transcriber.run_from_microphone(output_txt="my_spoken_notes.txt")

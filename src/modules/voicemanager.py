@@ -3,7 +3,6 @@ class WhisperTranscriber:
   def __init__(
       self,
       model_size: str = "base",
-      duration: int = 5,
       sample_rate: int = 16000,
       temp_filename: str = "temp_recording.wav",
   ):
@@ -22,7 +21,6 @@ class WhisperTranscriber:
     self.whisper = whisper
 
     self.model_size = model_size
-    self.duration = duration
     self.sample_rate = sample_rate
     self.temp_filename = temp_filename
     self.model = None
@@ -34,11 +32,11 @@ class WhisperTranscriber:
       print(f"Loading Whisper model ('{self.model_size}')...")
       self.model = self.whisper.load_model(self.model_size)
 
-  def record_audio(self):
+  def record_audio(self, duration: int = 5):
     """Records audio from the microphone using the sounddevice attribute."""
-    print(f"🎤 Recording for {self.duration} seconds... Speak now!")
+    print(f"🎤 Recording for {duration} seconds... Speak now!")
     self.audio_data = self.sd.rec(
-        int(self.duration * self.sample_rate),
+        int(duration * self.sample_rate),
         samplerate=self.sample_rate,
         channels=1,
         dtype=self.np.int16,
@@ -75,10 +73,10 @@ class WhisperTranscriber:
 
     return transcription
 
-  def run_from_microphone(self, output_txt: str = "mic_transcription.txt"):
+  def run_from_microphone(self, output_txt: str = "mic_transcription.txt", duration: int = 5):
     """Pipeline to record from the microphone, transcribe, and save to a text file."""
     self.load_model()
-    self.record_audio()
+    self.record_audio(duration=duration)
     self.save_audio()
 
     transcription = self.transcribe_file(file_path=self.temp_filename, output_txt=output_txt)
